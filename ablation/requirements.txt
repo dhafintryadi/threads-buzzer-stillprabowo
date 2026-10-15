@@ -1,0 +1,5 @@
+# Python 3.13
+pandas==3.0.3
+numpy==2.2.5
+matplotlib==3.10.9
+scikit-learn==1.8.0

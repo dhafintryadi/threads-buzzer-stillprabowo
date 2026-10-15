@@ -1,0 +1,13 @@
+* text=auto eol=lf
+
+# Masukan yang SHA-256-nya dibekukan/dicatat di manifest: byte dipertahankan apa adanya.
+*.yaml -text
+data_inputs/** -text
+feature_engineering/lexicon/*.txt -text
+preprocess/annotation/pedoman_anotasi.md -text
+
+*.png binary
+*.jpg binary
+*.zip binary
+*.docx binary
+*.pdf binary

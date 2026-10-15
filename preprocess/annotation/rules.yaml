@@ -1,0 +1,18 @@
+# Aturan penetapan label = Tabel 4 pedoman (versi ACC dosen, 5 Okt 2026).
+# Aturan dicek berurutan; aturan pertama yang cocok menentukan label, selain itu default_label.
+#   requires_any: minimal satu indikator ini bernilai "ya"
+#   requires_all: semua indikator ini bernilai "ya"
+#   min_yes     : minimal `count` dari indikator `of` bernilai "ya"
+# IP1, IP2, IP4 = indikator berbasis teks (caption_text). IP3 tidak dapat menjadi dasar label sendirian:
+# pada baris "terpenuhi sebagian", IP3 hanya bisa menjadi salah satu dari minimal dua indikator.
+
+ip3_min_topic_posts: 2      # IP3 = threads_topik + balasan_topik >= 2 (dipakai bila rules.ip3_from_columns: true)
+
+rules:
+  # Tabel 4 baris 1: KU terpenuhi + minimal 1 indikator berbasis teks -> buzzer
+  - {ku: terpenuhi, requires_any: [ip1, ip2, ip4], label: buzzer}
+  # Tabel 4 baris 2: KU terpenuhi sebagian + minimal 2 indikator (IP1-IP4) -> buzzer
+  - {ku: sebagian, min_yes: {count: 2, of: [ip1, ip2, ip3, ip4]}, label: buzzer}
+
+# Tabel 4 baris 3-4: KU terpenuhi/sebagian selain kombinasi pada dua baris di atas, dan KU tidak terpenuhi -> non_buzzer
+default_label: non_buzzer

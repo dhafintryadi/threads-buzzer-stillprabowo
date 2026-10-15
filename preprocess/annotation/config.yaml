@@ -1,0 +1,91 @@
+# Config pipeline anotasi (spec v2 + revisi review, 2 Okt 2026). Path relatif terhadap folder annotation/.
+# null pada keputusan peneliti = belum diputuskan; tahap yang membutuhkannya berhenti dengan pesan jelas.
+# `python -m annotation status` menampilkan daftarnya. Flag [USUL] punya default; lihat README.
+
+input:
+  clean_data_path: ../data/processed/clean_data.csv
+  # Kontrak clean_data.csv (626 baris, 9 kolom). Kolom hilang -> berhenti; kolom tambahan -> dilaporkan.
+  contract_columns: [user_id, follower_count, threads_count, replies_count, reposts_count,
+                     threads_topik, balasan_topik, items_scanned, caption_text]
+  # Kolom yang dirender ke prompt dan ke reviewer (kontrak input = ini + user_id).
+  # Tidak termasuk user_id (kunci pemetaan) dan items_scanned (= jumlah tiga kolom hitungan; redundan).
+  annotation_input_columns: [follower_count, threads_count, replies_count, reposts_count,
+                             threads_topik, balasan_topik, caption_text]
+
+guideline:
+  path: pedoman_anotasi.md
+  # Dibekukan sebelum GATE 1: isi hash berkas di sini (A1 mencetaknya bila masih null). Invarian I8.
+  sha256: 9aeb90728d24b30605bf9d9f3b37262253c371e3c08933a27fd60a46ad21bb0d
+
+subset:
+  fraction: 0.10                     # [ACC] ±10% -> 63 akun untuk N=626 (pedoman menulis "sekitar 62")
+  seed: 20261002
+  split_tuning_fraction: 0.5         # [keputusan peneliti] 1:1 -> 31 tuning / 32 validation; sisa ganjil -> validation
+  stratify_split_by_manual_label: true   # [keputusan peneliti]
+  min_validation_positives: 0        # [keputusan peneliti] tidak memblokir; jumlah + Wilson dicetak. 0 buzzer tetap berhenti
+
+optimization:
+  recall_threshold: 0.85             # [ACC]
+  max_optimizations: 3               # [ACC] tafsiran [USUL]: v1 + 3 revisi = maks 4 evaluasi
+  freeze_on_limit: best_validation   # [USUL] bila batas tercapai tanpa ambang: best_validation (seri -> terbaru) | last
+  eval_repeats: 1                    # [USUL] pengulangan evaluasi A2; aturan berhenti memakai pengulangan pertama
+  metric_class: buzzer
+
+prompt:
+  format: chen_two_message           # dua pesan (system + user), bagian ditandai header; lihat layout
+  # [keputusan peneliti] static_system: bagian beku (peran, instruksi, kriteria, aturan, contoh, respons, opsi) di
+  # system -- identik antar-akun sehingga prefiks bisa di-cache -- dan hanya data akun + ANSWER: di user.
+  # chen: tata letak lama (data akun di akhir system; instruksi dan kriteria di user). prompt_vN.yaml boleh
+  # menimpanya dengan kunci `layout`. Tata letak ikut menentukan prompt_sha256.
+  layout: static_system
+  eval_mode: simultaneous            # semua kriteria dalam satu panggilan (satu-satunya mode)
+  answer_suffix: "ANSWER:"
+  # [USUL] markdown: bagian ditandai header markdown (Chen) | json: bagian yang sama sebagai objek JSON.
+  # Default untuk semua versi; prompt_vN.yaml boleh menimpanya dengan kunci `render_format`. Format ikut
+  # menentukan prompt_sha256, jadi varian JSON harus disimpan sebagai versi baru (mis. v3 dengan render_format: json).
+  render_format: markdown
+  # IP pada jawaban contoh few-shot saat KU = tidak. null: ditulis null, sesuai response_format (default kode).
+  # as_labeled: isian manual apa adanya ("tidak"/"ya"). Run v2 dan v3 (prompt beku) memakai as_labeled karena kernel
+  # notebook masih memuat kode lama; nilai ini mereproduksi prompt yang benar-benar dikirim (I3). Ikut menentukan sha.
+  fewshot_ip_when_ku_not_met: as_labeled
+
+llm:
+  model: gpt-5-mini                  # snapshot persis dicatat dari respons API
+  one_account_per_call: true
+  workers: 8
+  # null = tidak dikirim (model memakai nilai bawaannya). Chen memakai temperature 0 dan top_p 1; menurut
+  # laporan komunitas GPT-5 Mini menolak nilai selain 1 (belum terkonfirmasi dokumentasi resmi -- uji dengan
+  # `python -m annotation probe`). Yang benar-benar dikirim tercatat di request_params.
+  temperature: null
+  top_p: null
+  reasoning_effort: null             # null = bawaan model; diputuskan peneliti setelah pilot (uji lewat `probe`)
+  max_completion_tokens: null        # null = tidak dikirim; diputuskan peneliti setelah pilot (lihat reasoning_tokens)
+  max_input_tokens: 1000             # pengaman; caption terpanjang ±318 token
+  truncation_policy: fail            # tidak ada pemotongan
+  repair_json: true                  # [CHEN] perbaiki JSON rusak (pustaka json-repair) sebelum validasi
+  max_parse_retries: 2
+  max_api_retries: 5                 # retry SDK OpenAI (backoff eksponensial untuk 429/5xx/koneksi)
+
+output_schema:
+  ip_when_ku_not_met: "null"         # [USUL] "null": IP boleh kosong bila ku=tidak | "filled": selalu diisi
+
+rules:
+  path: rules.yaml                   # Tabel 4
+  label_policy: llm                  # [USUL] llm: label LLM dipakai, aturan hanya diperiksa | derived: label dari aturan
+  ip3_from_columns: true             # [USUL] IP3 untuk pemeriksaan aturan dihitung dari kolom numerik
+  manual_rule_check: block           # [USUL] label manusia vs Tabel 4: block (impor berhenti) | derive (label diturunkan)
+
+review:
+  tool: label_studio
+  shuffle_seed: 20261002
+  show_llm_label: true               # [ACC] label LLM sebagai pra-anotasi
+  show_llm_ku_ip: false              # KU/IP LLM disimpan di data tugas, tidak ditampilkan
+  fill_ku_ip: true                   # [USUL] true: peninjau mengisi KU/IP + label | false: hanya label
+
+final_label:
+  # [keputusan peneliti] akun subset memakai label manual dan DIKELUARKAN dari tinjauan GATE 3 (menyimpang dari
+  # ACC, dicatat di Bab III). Harus true: akun subset tidak ditinjau, jadi labelnya harus dari label manual.
+  manual_subset_overrides: true
+
+output:
+  dir: out

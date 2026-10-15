@@ -1,0 +1,6 @@
+# Python 3.13. Kunci lengkap lingkungan run final: requirements.lock.txt.
+numpy==2.5.4
+pandas==3.0.3
+scikit-learn==1.9.1
+PyYAML==6.0.3
+imbalanced-learn==0.14.2

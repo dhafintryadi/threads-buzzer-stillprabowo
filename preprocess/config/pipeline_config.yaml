@@ -1,0 +1,104 @@
+# Konfigurasi pipeline preprocessing clean_data.csv.
+# Semua path relatif terhadap root folder `preprocess/`.
+# Parameter yang ditandai "TODO Dav" mengacu ke §11 spesifikasi -- JANGAN
+# diisi dengan tebakan; isi hanya setelah keputusan dikonfirmasi Dav, dan
+# tahap yang membutuhkannya akan fail-fast selama masih null (lihat
+# config.py::require()).
+
+paths:
+  # --- Input mentah (§1) ---
+  raw_table_a_akun: "../scraper/data/processed/dataset_akun_fitur.csv"        # Data Mentah Akun
+  raw_table_b_teks: "../scraper/data/processed/qualifying_posts.csv"        # Data Mentah Teks Unggahan
+  # Snapshot checkpoint feed scraper -- sumber status per tab untuk `bound_type`.
+  # HARUS snapshot yang sama dengan Tabel A di atas (dicek lewat kecocokan
+  # stopped_reason, lihat bound_type.strict_snapshot_check).
+  raw_feed_checkpoint_json: "../scraper/data/checkpoints/feed_done_users.json"
+
+  # --- Output antara §2-§6 ---
+  table_a_clean_csv: "data/processed/fitur_akun.csv"
+  table_b_cascaded_csv: "data/processed/fitur_teks_cascaded.csv"
+  table_b_aggregated_csv: "data/processed/fitur_teks_aggregated.csv"
+  removed_rows_log_csv: "data/processed/removed_rows_log.csv"
+  duplicate_diagnostic_report_csv: "data/processed/duplicate_diagnostic_report.csv"
+  data_quality_report_json: "data/processed/data_quality_report.json"
+
+  # --- Output §7 ---
+  clean_data_csv: "data/processed/clean_data.csv"
+
+  # --- Serah terima dari paket annotation/ (dibaca SAJA; tahap §9 tidak pernah menulis ke annotation/) ---
+  clean_data_labeled_csv: "annotation/out/clean_data_labeled.csv"
+  annotation_report_json: "annotation/out/annotation_report.json"
+
+  # --- tahap 06 (akhir pipeline preprocessing) ---
+  clean_data_text_csv: "data/processed/clean_data_text_preprocessed.csv"
+
+  # --- manifest ---
+  run_manifest_json: "data/processed/run_manifest.json"
+
+csv_io:
+  encoding: "utf-8"
+  quoting: "QUOTE_MINIMAL"   # QUOTE_MINIMAL | QUOTE_ALL | QUOTE_NONNUMERIC | QUOTE_NONE
+  sort_column: "user_id"
+
+# §2 -- nilai hilang Data Akun + pemilihan populasi analisis.
+missing_value_policy:
+  always_drop_if_missing: ["follower_count", "items_scanned"]
+  # Baris dibuang bila nilainya tepat 0 (penyederhanaan, keputusan peneliti): items_scanned == 0
+  # = tak ada item dalam jendela yang terklasifikasi di ketiga tab.
+  drop_if_zero: ["items_scanned"]
+  ignored_columns: ["media_count", "view_count"]   # bukan fitur final (view_count sengaja di-drop, §0.2)
+
+# Populasi analisis TUNGGAL (satu output: clean_data.csv): akun `exact` + akun `lower bound only`.
+# Akun dipertahankan bila SEMUA tab-nya berkelas salah satu dari:
+#   exact        ketiga tab mencapai batas jendela observasi / akhir feed
+#   cap          tab kena batas scroll/waktu -> nilai batas bawah (item nyata)
+#   stalled_data tab stalled tetapi sempat mengumpulkan item -> nilai batas bawah (item nyata)
+# Akun dengan tab stalled_zero (stalled tanpa item: nilai tidak diketahui, nol palsu) atau
+# unobservable (private/tidak tersedia) DIBUANG, termasuk akun campuran seperti "stalled_data +
+# stalled_zero" (bukan lower bound ONLY). `bound_type` (exact / cap /
+# stalled_partial) hanya dipakai internal dan dicatat di run manifest; bukan kolom output. Desain populasi sensitivity dan text-only DIBATALKAN.
+population:
+  allowed_tab_classes: ["exact", "cap", "stalled_data"]
+
+# Klasifikasi strata A-E (`bound_type`) dari checkpoint feed per tab -- dipakai untuk menentukan
+# populasi analisis.
+#   Kelas per tab: exact (status complete) | cap (stopped_at_cap) |
+#   stalled_data (stalled, items_scanned>0) | stalled_zero (stalled, items_scanned==0) |
+#   unobservable (reason di unobservable_reasons).
+#   Kelas akun, prioritas menurun: unobservable > stalled_partial > unknown > cap > exact.
+bound_type:
+  unobservable_reasons: ["private_profile", "account_unavailable"]
+  # true = berhenti bila stopped_reason Tabel A tidak cocok dengan checkpoint
+  # (indikasi dua snapshot berbeda -> bound_type tidak konsisten dengan angka).
+  strict_snapshot_check: true
+
+# §4 -- duplikasi pada Data Teks
+duplicate_handling:
+  # "identical_rows_only": drop_duplicates() baris identik penuh saja
+  #   (asumsi: data sudah dari scraper pasca-perbaikan bug fetch pk ganda).
+  # "tie_break": dedup per pk dengan prioritas source > taken_at_utc
+  #   terawal > code terkecil (asumsi: bug unsupported_metrics ~61% overlap
+  #   masih ada di data yang diproses).
+  # TODO Dav (§11.2): konfirmasi mode mana yang berlaku sebelum run pertama.
+  pk_duplicate_mode: "identical_rows_only"
+  tie_break_source_priority: ["primary", "unsupported_metrics_fallback"]
+
+# §7 -- integrasi
+integration:
+  join_type: "left"   # TODO Dav (§11.4) -- usulan left join dari Tabel A (akun), belum final
+
+# Text preprocessing (tahap 06 = tahap terakhir pipeline ini): ALIRAN T untuk TF-IDF.
+#   pembersihan bersama -> tokenisasi [a-z]+(?:-[a-z]+)* -> stopword Sastrawi -> stem bawaan -> caption_text_clean.
+# Kepadatan leksikon (aliran L) dihitung di tahap rekayasa fitur yang terpisah (lihat ../feature_engineering/).
+text_features:
+  # Penanda batas antarunggahan saat agregasi (tahap 03). SPASI: clean_data.csv dan keluaran anotasi
+  # (annotation/out/clean_data_labeled.csv) sudah dibangun dengan spasi, dan pada data ini mengganti ke
+  # newline mengubah caption 58 akun tanpa mengubah satu pun hitungan kecocokan leksikon. Mengubah nilai ini
+  # mengubah caption_text di clean_data.csv -> tahap 03/04 dan anotasi harus dijalankan ulang.
+  post_boundary_marker: " "
+
+  extra_roots: ["goblog", "mahasewa", "aseng", "soros", "proksi"]   # akar tambahan untuk kamus diperluas
+  expected_dict_hash: "234af12c2c21da48"  # golden hash kamus (PySastrawi 1.2.1); beda -> berhenti
+  stream_t:
+    stemmer_dictionary: "default"        # default (sesuai ACC) | extended (keputusan terbuka)
+    stopwords: "sastrawi_default"        # 809 kata (PySastrawi 1.2.1)

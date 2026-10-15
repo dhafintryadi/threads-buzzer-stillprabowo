@@ -1,0 +1,38 @@
+# Environment & cache
+venv/
+.venv*/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+.DS_Store
+Thumbs.db
+
+# Rahasia / sesi login
+auth_state.json
+**/browser_profile/
+.env
+*.env
+preprocess/annotation/label_studio_data/
+
+# Data (berisi data pribadi pengguna Threads)
+scraper/data/
+scraper/logs/
+preprocess/data/processed/
+preprocess/annotation/out/
+preprocess/annotation/state/
+preprocess/annotation/exports/
+preprocess/annotation/demo/
+preprocess/annotation/prompts/fewshot_*.json
+feature_engineering/features/
+feature_engineering/features_sensitivity_token/
+model/outputs/
+ablation/output/
+
+# Tes
+**/tests/
+pytest.ini
+
+# Arsip dan dokumen
+_archive/
+docs/

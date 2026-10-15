@@ -1,0 +1,21 @@
+﻿leksikon,id,entri,sumber,tingkat_sumber,risiko_ambigu,n_akun,n_kemunculan,bentuk_teramati,varian_pencocokan,catatan
+A,A01,bodoh,Indriyani & Ratnasari (2026) (kamus hinaan),ACC,sedang,13,18,bodoh (10) | kebodohan (3) | pembodohan (2) | dibodohi (2) | bodohnya (1),membodohi | dibodohi | kebodohan | membodohkan | bodoh-bodoh | bodohnya | pembodohan,Varian 'pembodohan' ditambahkan 15 Okt 2026 (teramati di data; tidak tertangkap tanpa stemming)
+A,A02,tolol,Indriyani & Ratnasari (2026) (kamus hinaan),ACC,rendah,12,19,tolol (13) | tooolol (1) | tolollllll (1) | ketololan (1) | tololl (1) | ketololannya (1) | tololin (1),ketololan | tolol-tolol | tololnya | tooolol | tolollllll | tololl | ketololannya | tololin,Varian 'tooolol' 'tolollllll' 'tololl' 'ketololannya' 'tololin' ditambahkan 15 Okt 2026 (teramati di data; tidak tertangkap tanpa stemming)
+A,A03,goblok,Indriyani & Ratnasari (2026) (kamus hinaan),ACC,rendah,8,9,goblok (9),kegoblokan | goblok-goblok | gobloknya | digoblokin,
+A,A04,idiot,Indriyani & Ratnasari (2026) (kamus hinaan),ACC,sedang,4,4,idiot (4),keidiotan | mengidiotkan | idiotnya,
+A,A05,dungu,Indriyani & Ratnasari (2026) (kamus hinaan),ACC,rendah,1,1,dungu (1),kedunguan | dungunya,
+A,A07,sampah,Indriyani & Ratnasari (2026) (kamus hinaan),ACC,tinggi,2,4,sampah (2) | sampahnya (1) | sampaahhh (1),bersampah | disampahkan | sampahnya | sampah-sampah | disampahin | sampaahhh,Di data dominan makna harfiah (sampah = limbah); perlu keputusan peneliti; varian 'sampaahhh' ditambahkan 15 Okt 2026 (teramati di data; tidak tertangkap tanpa stemming)
+A,A08,gendut,Indriyani & Ratnasari (2026) (kamus body shaming),ACC,sedang,2,2,gendut (2),kegendutan | menggendut | gendutan | gendutnya | digendutin,
+A,A09,jelek,Indriyani & Ratnasari (2026) (kamus body shaming),ACC,tinggi,5,6,jelek (6),kejelekan | menjelekkan | dijelek-jelekkan | jelek-jelekan | jeleknya | dijelekin,"Di data campuran: 1 akun 'jelek paras' (hinaan), sisanya 'jelek' = kualitas/ucapan; perlu keputusan peneliti"
+A,A10,mati aja,Indriyani & Ratnasari (2026) (kamus ancaman),ACC,sedang,1,1,matikan saja (1),mati ajalah | dimatikan aja | mati saja | dimatiin aja | matikan saja,Teramati sebagai 'matikan saja'; varian 'matikan saja' ditambahkan 15 Okt 2026 (teramati di data; tidak tertangkap tanpa stemming)
+A,A12,anjing,Indriyani & Ratnasari (2026) (kamus hinaan),SUMBER,tinggi,6,8,anjing (7) | anjingnya (1),anjing-anjing | anjingnya | menganjingkan,Mayoritas kemunculan berupa hinaan; satu perbandingan dengan hewan
+A,A13,anjir,Indriyani & Ratnasari (2026) (kamus hinaan),SUMBER,tinggi,4,4,njir (3) | anjir (1),njir,Varian 'njir' ditambahkan (teramati di data)
+A,A16,bego,Indriyani & Ratnasari (2026) (kata kunci pengumpulan data),KATA_KUNCI,sedang,3,4,bego (3) | begonya (1),begonya | kebegoan,
+A,A17,lonte,Indriyani & Ratnasari (2026) (kueri pengumpulan data),KATA_KUNCI,rendah,1,1,lonte (1),lontenya,
+A,A18,kampret,Indriyani & Ratnasari (2026) (contoh hasil prapemrosesan),CONTOH,sedang,1,1,kampret (1),kampret-kampret | kampretnya,Belum terkonfirmasi di teks sumber
+A,A19,kontol,Indriyani & Ratnasari (2026) (contoh analisis kesalahan),CONTOH,tinggi,1,1,kontol (1),kontolnya | dikontolin,Bukan tingkat ACC; 1 kemunculan
+A,A21,goblog,usulan peneliti (bukan dari kedua referensi),ORTOGRAFI,rendah,1,1,goblog (1),goblognya | kegoblogan | digoblogin | goblog-goblog,"Usulan peneliti (ortografi), bukan dari sumber"
+B,B01,antek asing,Amnesty International (2026),ACC,rendah,1,1,antek asing (1),antek-antek asing | anteknya asing | antek-anteknya asing,
+B,B04,mahasewa,Amnesty International (2026),ACC,rendah,1,1,mahasewa (1),mahasewa-mahasewa | mahasewaan | mahasewanya,
+B,B09,antek aseng,Amnesty International (2026) (istilah rasialis),SUMBER,rendah,1,1,antek aseng (1),antek-antek aseng | anteknya aseng,
+B,B19,pengkhianat bangsa,Amnesty International (2026) (tagar #MediaTempoPengkhianatBangsa),KUTIPAN,sedang,2,2,penghianat bangsa (1) | pengkhianat bangsa (1),mengkhianati bangsa | pengkhianat-pengkhianat bangsa | pengkhianatan bangsa | penghianat bangsa | penghianat negara,Ejaan 'penghianat' ditambahkan (teramati di data)

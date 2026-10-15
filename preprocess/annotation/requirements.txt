@@ -1,0 +1,7 @@
+# Python 3.13 (miniconda). Batas bawah: diuji pada pandas 2.2 dan 3.0.
+pandas>=2.2
+numpy>=1.26
+PyYAML>=6.0
+tiktoken>=0.11
+json-repair>=0.63
+openai>=3.24

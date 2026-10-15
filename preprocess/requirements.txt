@@ -1,0 +1,5 @@
+# Python 3.13. PySastrawi 1.2.1 (bukan Sastrawi 1.0.1: nama import sama, daftar stopword berbeda); jangan pasang keduanya.
+pandas==3.0.3
+numpy==2.5.3
+PyYAML==6.0.3
+PySastrawi==1.2.1

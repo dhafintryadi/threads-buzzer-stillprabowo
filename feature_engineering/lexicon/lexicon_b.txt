@@ -1,0 +1,19 @@
+# Dibuat mekanis dari leksikon_a_b_data_terseleksi.csv (sha256 a247576abb1bf28d) oleh convert_lexicon_csv.py, 2026-10-15.
+# Aturan: semua entri leksikon B; istilah = entri + varian_pencocokan. Jangan edit manual: ubah CSV, lalu jalankan ulang.
+antek asing
+antek-antek asing
+anteknya asing
+antek-anteknya asing
+mahasewa
+mahasewa-mahasewa
+mahasewaan
+mahasewanya
+antek aseng
+antek-antek aseng
+anteknya aseng
+pengkhianat bangsa
+mengkhianati bangsa
+pengkhianat-pengkhianat bangsa
+pengkhianatan bangsa
+penghianat bangsa
+penghianat negara

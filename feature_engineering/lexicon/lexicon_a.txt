@@ -1,0 +1,79 @@
+# Dibuat mekanis dari leksikon_a_b_data_terseleksi.csv (sha256 a247576abb1bf28d) oleh convert_lexicon_csv.py, 2026-10-15.
+# Aturan: semua entri leksikon A; istilah = entri + varian_pencocokan. Jangan edit manual: ubah CSV, lalu jalankan ulang.
+bodoh
+membodohi
+dibodohi
+kebodohan
+membodohkan
+bodoh-bodoh
+bodohnya
+pembodohan
+tolol
+ketololan
+tolol-tolol
+tololnya
+tooolol
+tolollllll
+tololl
+ketololannya
+tololin
+goblok
+kegoblokan
+goblok-goblok
+gobloknya
+digoblokin
+idiot
+keidiotan
+mengidiotkan
+idiotnya
+dungu
+kedunguan
+dungunya
+sampah
+bersampah
+disampahkan
+sampahnya
+sampah-sampah
+disampahin
+sampaahhh
+gendut
+kegendutan
+menggendut
+gendutan
+gendutnya
+digendutin
+jelek
+kejelekan
+menjelekkan
+dijelek-jelekkan
+jelek-jelekan
+jeleknya
+dijelekin
+mati aja
+mati ajalah
+dimatikan aja
+mati saja
+dimatiin aja
+matikan saja
+anjing
+anjing-anjing
+anjingnya
+menganjingkan
+anjir
+njir
+bego
+begonya
+kebegoan
+lonte
+lontenya
+kampret
+kampret-kampret
+kampretnya
+kontol
+kontolnya
+dikontolin
+goblog
+goblognya
+kegoblogan
+digoblogin
+goblog-goblog

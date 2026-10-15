@@ -1,0 +1,73 @@
+# Konfigurasi pipeline rekayasa fitur (spec 15 Okt 2026). Path relatif terhadap folder feature_engineering/.
+# Status tiap parameter mengikuti spec Bagian 3: "Final", atau "menunggu konfirmasi" (usulan/asumsi).
+
+paths:
+  # Keluaran tahap 06 preprocess = clean_data_labeled.csv + caption_text_clean (aliran T, row-wise).
+  input_csv: "../preprocess/data/processed/clean_data_text_preprocessed.csv"
+  # Pembersihan bersama dari preprocess (spec dual-stream), dimuat langsung -- tidak didefinisikan ulang.
+  shared_clean_py: "../preprocess/text_streams/shared_clean.py"
+  # Leksikon: satu istilah per baris, disusun peneliti. Pipeline TIDAK membangun/mengubahnya.
+  lexicon_a_txt: "lexicon/lexicon_a.txt"
+  lexicon_b_txt: "lexicon/lexicon_b.txt"
+  # Satu set fitur saja (keputusan Dav 15 Okt 2026, pembacaan A): kepadatan leksikon / jumlah token. Nama folder
+  # dipertahankan sebagai keluaran utama; set penyebut jumlah entri (features/) tidak dipakai lagi.
+  output_dir: "features_sensitivity_token"
+
+# Pemetaan nama kolom spec -> nama aktual di input. Eksekusi berhenti bila kolom tidak ditemukan.
+columns:
+  user_id: user_id
+  follower_count: follower_count
+  replies_count: replies_count
+  repost_count: reposts_count
+  topic_threads_count: threads_topik
+  topic_replies_count: balasan_topik
+  items_scanned: items_scanned
+  caption_text: caption_text
+  caption_text_stream_t: caption_text_clean   # aliran T (cleaning -> token -> stopword -> stem) dari preprocess 06
+  label: label
+
+expected_rows: 626          # data yang dikunci; beda -> berhenti
+
+split:
+  test_sizes: [0.30, 0.20, 0.10]          # Final: 70:30, 80:20, 90:10; acak, terpisah, stratified pada label
+  seeds: {"0.3": 20261015, "0.2": 20261016, "0.1": 20261017}   # Final: seed tetap berbeda per split
+  stratify_tolerance: 0.02                # |proporsi buzzer train/test - proporsi keseluruhan| maksimum
+
+tfidf:                                     # TfidfVectorizer; di-fit hanya pada akun latih
+  ngram_range: [1, 1]
+  min_df: 1
+  max_df: 1.0
+  sublinear_tf: false
+  smooth_idf: true
+  norm: "l2"
+
+outlier:                        # aturan outlier tunggal (keputusan Dav 15 Okt 2026)
+  rule: "tukey"
+  iqr_multiplier: 1.5
+  prop_threshold: 0.05          # ambang outlier 5%
+scaler:
+  # Keputusan Dav 15 Okt 2026: jika LEBIH DARI SATU fitur memenuhi syarat (IQR > 0) punya proporsi outlier > ambang
+  # -> z-score untuk SEMUA 8 fitur; selain itu min-max untuk semua fitur. Satu scaler per split, di-fit pada data latih.
+  rule: "more_than_one_outlier_feature_zscore_else_minmax"
+  # true = aturan outlier (Tukey) + parameternya + aturan pemilihan scaler dikonfirmasi peneliti (Dav, 15 Okt 2026).
+  # Tahap model menolak evaluasi bila false (spec model §2 gerbang 2).
+  confirmed: true
+
+lexicon:
+  occurrence: "total"           # menunggu konfirmasi: total kemunculan (pengulangan dihitung)
+  stemming: false               # menunggu konfirmasi: tanpa stemming pada aliran leksikon
+  sparse_warning_zero_prop: 0.50  # laporkan (tidak diperbaiki) bila > 50% nilai = 0
+  # Penyebut kepadatan (keputusan Dav 15 Okt 2026, pembacaan A): "tokens" = kemunculan / jumlah token aliran
+  # leksikon akun (akun tanpa token -> 0). "entries" (kemunculan / jumlah entri leksikon) tidak dipakai.
+  denominator: "tokens"
+  # Pembekuan leksikon (DIISI PENELITI; spec model §2 gerbang 1). Saat membekukan: isi version, set frozen: true,
+  # dan salin SHA-256 lexicon_a.txt / lexicon_b.txt (features_sensitivity_token/report.json -> leksikon.*.sha256) ke frozen_sha256.
+  # Bila frozen: true, pipeline FE menolak berjalan jika isi leksikon berbeda dari frozen_sha256.
+  # Dibekukan Dav 15 Okt 2026 (leksikon CSV + 8 varian teramati, konversi mekanis).
+  version: "v1"
+  frozen: true
+  frozen_sha256: {a: 7347437d62a4c19b999d78cce47cc6b2a7fbbd79e7c3dee74e61fbf2d690248a, b: 49b17d92675700ecdfad1efae8bd4efd978700388d5bd11cea2e0876fda023f4}
+
+features:
+  akun: [pengikut, rasio_balasan, rasio_unggahan_ulang, threads_topik, balasan_topik]
+  teks: [similarity, kepadatan_leksikon_a, kepadatan_leksikon_b]
